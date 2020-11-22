@@ -1,0 +1,41 @@
+project_name: nssh
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 7
+    main: ./cmd/nssh/main.go
+    binary: nssh
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X 'github.com/0x6b/nssh/cmd.Commit={{.ShortCommit}}'
+      - -X 'github.com/0x6b/nssh/cmd.Tag={{.Tag}}'
+#      .Tag .ShortCommit
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
