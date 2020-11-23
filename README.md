@@ -74,6 +74,72 @@ You can specify coverage type, profile name, port number, connection duration, o
   $ nssh connect pi@your-sim-name --port 2222 --duration 120
   ```
 
+### Details
+
+Global help:
+
+```console
+$ nssh --help
+nssh -- SSH client for SORACOM Napter
+
+Usage:
+  nssh [command]
+
+Available Commands:
+  connect     Connect to specified subscriber via SSH.
+  help        Help about any command
+  list        List port mappings for specified subscriber
+  version     Show version
+
+Flags:
+      --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
+  -h, --help                   help for nssh
+      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+```
+
+Help for `connect` sub-command:
+
+```console
+$ nssh connect --help
+Create port mappings for specified subscriber and connect via SSH. If <user>@ is not specified, "pi" will be used as default. Quote with " if name contains spaces or special characters.
+
+Usage:
+  nssh connect [<user>@]<subscriber name> [flags]
+
+Aliases:
+  connect, c
+
+Flags:
+  -d, --duration int      Specify session duration in minutes (default 60)
+  -h, --help              help for connect
+  -i, --identity string   Specify a path to file from which the identity for public key authentication is read
+  -p, --port int          Specify port number to connect (default 22)
+
+Global Flags:
+      --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
+      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+```
+
+Help for `list` sub-command:
+
+```console
+$ nssh list --help
+List port mappings for specified subscriber
+
+Usage:
+  nssh list <subscriber name> [flags]
+
+Aliases:
+  list, l
+
+Flags:
+  -h, --help   help for list
+
+Global Flags:
+      --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
+      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+```
+
 ## References
 
 - Japanese
