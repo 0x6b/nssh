@@ -49,11 +49,11 @@ func connectCmd() *cobra.Command {
 					os.Exit(1)
 				}
 			} else {
-				fmt.Println("nssh: → found available port mapping")
 				portMapping = &available[0]
+				fmt.Printf("nssh: → found available port mapping:\n%s\n", portMapping)
 			}
 
-			fmt.Printf("nssh: connect to %s:%d using following port mapping:\n%s\n", subscriber.Imsi, port, portMapping)
+			fmt.Printf("nssh: connect to %s:%d using the port mapping\n", subscriber.Imsi, port)
 			fmt.Println(strings.Repeat("-", 40))
 			err = client.Connect(login, identity, portMapping)
 			if err != nil {
@@ -122,8 +122,8 @@ func findPortMappings(subscriber nssh.Subscriber, port int) ([]nssh.PortMapping,
 		ip, err := nssh.GetIP()
 
 		// search port mappings which allows being connected from current IP address
-		if err == nil { // ignore ifconfig.co error
-			fmt.Printf("nssh: → current IP address is %s\n", ip)
+		if err == nil { // ignore https://checkip.amazonaws.com/ error
+			fmt.Printf("nssh: → check allowed CIDR for current IP address is %s\n", ip)
 			for _, pm := range currentPortMappings {
 				for _, r := range pm.Source.IPRanges {
 					_, ipNet, err := net.ParseCIDR(r)

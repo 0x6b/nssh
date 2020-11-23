@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// GetIP gets current global IP address using https://ifconfig.co
+// GetIP gets current global IP address using https://checkip.amazonaws.com/
 func GetIP() (net.IP, error) {
 	client := http.DefaultClient
 	req, err := http.NewRequest("GET", "https://checkip.amazonaws.com/", nil)
