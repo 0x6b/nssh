@@ -23,7 +23,7 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	RootCmd.PersistentFlags().StringVar(&coverageType, "coverage-type", "", "Specify coverage type, \"g\" for Global, \"jp\" for Japan")
-	RootCmd.PersistentFlags().StringVar(&profileName, "profile-name", "ssh", "Specify SORACOM CLI profileName name")
+	RootCmd.PersistentFlags().StringVar(&profileName, "profile-name", "ssh", "Specify SORACOM CLI profile name")
 
 	var err error
 	client, err = nssh.NewSoracomClient(coverageType, profileName)
