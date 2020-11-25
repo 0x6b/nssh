@@ -146,10 +146,8 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error)
 	}
 
 	var Subscribers []Subscriber
-	if err := json.NewDecoder(res.Body).Decode(&Subscribers); err != nil {
-		return nil, err
-	}
-	return Subscribers, nil
+	err = json.NewDecoder(res.Body).Decode(&Subscribers)
+	return Subscribers, err
 }
 
 // FindPortMappingsForSubscriber finds port mappings for specified subscriber
@@ -164,10 +162,8 @@ func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber Subscriber) ([]
 	}
 
 	var portMapping []PortMapping
-	if err := json.NewDecoder(res.Body).Decode(&portMapping); err != nil {
-		return nil, err
-	}
-	return portMapping, nil
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return portMapping, err
 }
 
 // CreatePortMappingsForSubscriber creates port mappings for specified
@@ -205,10 +201,8 @@ func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber Subscriber, p
 	}
 
 	var portMapping PortMapping
-	if err := json.NewDecoder(res.Body).Decode(&portMapping); err != nil {
-		return nil, err
-	}
-	return &portMapping, nil
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return &portMapping, err
 }
 
 // Connect connects to specified port mapping with login name and identity. If
@@ -305,19 +299,13 @@ func (c *SoracomClient) Connect(login, identity string, portMapping *PortMapping
 	}()
 
 	err = session.Wait()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return "", err
-	}
-	return string(password), nil
+	return string(password), err
 }
 
 func dup(dst io.Writer, src io.Reader) {
@@ -354,11 +342,8 @@ func getAuthInfoFromProfile(profileName string) (string, string, string, error) 
 		AuthKey      *string `json:"authKey"`
 		CoverageType *string `json:"coverageType"`
 	}{}
-	if err := json.Unmarshal(b, &p); err != nil {
-		return "", "", "", fmt.Errorf("failed to decode auth response: %w", err)
-	}
-
-	return *p.AuthKeyID, *p.AuthKey, *p.CoverageType, nil
+	err = json.Unmarshal(b, &p)
+	return *p.AuthKeyID, *p.AuthKey, *p.CoverageType, err
 }
 
 func getProfileDir() (string, error) {
@@ -415,13 +400,8 @@ func (c *SoracomClient) callAPI(params *apiParams) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	res, err := c.doRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return res, err
 }
 
 func (c *SoracomClient) makeRequest(params *apiParams) (*http.Request, error) {
