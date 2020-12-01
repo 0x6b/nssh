@@ -28,7 +28,6 @@ $ make # and you'll get `nssh` under the root directory
      "statements": [
        {
          "api": [
-           "Auth:auth",
            "Subscriber:listSubscribers",
            "PortMapping:listPortMappingsForSubscriber",
            "PortMapping:createPortMapping"
@@ -39,10 +38,10 @@ $ make # and you'll get `nssh` under the root directory
    }
    ```
 2. Generate authentication key for the user.
-3. Save the authentication information at `$HOME/.soracom/ssh.json`.
+3. Save the authentication information at `$HOME/.soracom/nssh.json`, or `%HOMEPATH%\.soracom\ssh.json` as below.
    ```json5
    {
-     "coverageType": "jp", // or "g" for global
+     "coverageType": "jp", // default coverage, specify "g" for global
      "authKeyId": "keyId-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
      "authKey": "secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
    }
@@ -117,7 +116,7 @@ Flags:
 
 Global Flags:
       --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
-      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+      --profile-name string    Specify SORACOM CLI profile name (default "nssh")
 ```
 
 Help for `list` sub-command:
