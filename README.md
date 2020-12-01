@@ -2,6 +2,8 @@
 
 SSH client for [SORACOM Napter](https://developers.soracom.io/en/docs/napter/). You can easily open an SSH connection with your subscriber's name.
 
+![How it works](media/nssh.gif)
+
 Napter is an on-demand networking service for devices using Soracom Air for Cellular SIM cards, which enables you to quickly and securely access your devices remotely. Napter allows you to perform remote maintenance, troubleshooting, or other typical remote access tasks, without setting up any relay servers or installing agent software on the device.
 
 ## Install
