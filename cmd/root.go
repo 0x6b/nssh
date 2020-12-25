@@ -25,14 +25,19 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&coverageType, "coverage-type", "", "Specify coverage type, \"g\" for Global, \"jp\" for Japan")
 	RootCmd.PersistentFlags().StringVar(&profileName, "profile-name", "nssh", "Specify SORACOM CLI profile name")
 
+	cobra.OnInitialize(initConfig)
+
+	RootCmd.AddCommand(listCmd())
+	RootCmd.AddCommand(connectCmd())
+	RootCmd.AddCommand(versionCmd())
+}
+
+func initConfig() {
+	fmt.Println(coverageType)
 	var err error
 	client, err = nssh.NewSoracomClient(coverageType, profileName)
 	if err != nil {
 		fmt.Println("failed to create a client: ", err)
 		os.Exit(1)
 	}
-
-	RootCmd.AddCommand(listCmd())
-	RootCmd.AddCommand(connectCmd())
-	RootCmd.AddCommand(versionCmd())
 }
