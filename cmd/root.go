@@ -33,7 +33,6 @@ func init() {
 }
 
 func initConfig() {
-	fmt.Println(coverageType)
 	var err error
 	client, err = nssh.NewSoracomClient(coverageType, profileName)
 	if err != nil {
