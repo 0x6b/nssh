@@ -1,6 +1,6 @@
 module github.com/0x6b/nssh
 
-go 1.18
+go 1.20
 
 require (
 	github.com/mitchellh/go-homedir v1.1.0
