@@ -304,7 +304,7 @@ func (c *SoracomClient) Connect(login, identity string, portMapping *PortMapping
 
 func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	password, err := terminal.ReadPassword(syscall.Stdin)
 	return string(password), err
 }
 
