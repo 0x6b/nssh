@@ -149,11 +149,44 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error)
 	return Subscribers, err
 }
 
+// GetSubscriber gets subscriber information for specified IMSI
+func (c *SoracomClient) GetSubscriber(imsi string) (*Subscriber, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   fmt.Sprintf("subscribers/%s", imsi),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var subscriber Subscriber
+	err = json.NewDecoder(res.Body).Decode(&subscriber)
+
+	return &subscriber, err
+}
+
 // FindPortMappingsForSubscriber finds port mappings for specified subscriber
 func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber Subscriber) ([]PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var portMapping []PortMapping
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return portMapping, err
+}
+
+// FindPortMappings finds all port mappings
+func (c *SoracomClient) FindPortMappings() ([]PortMapping, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   "port_mappings",
 		body:   "",
 	})
 	if err != nil {
