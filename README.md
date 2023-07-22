@@ -6,7 +6,12 @@ SSH client for [SORACOM Napter](https://developers.soracom.io/en/docs/napter/). 
 
 Napter is an on-demand networking service for devices using Soracom Air for Cellular SIM cards, which enables you to quickly and securely access your devices remotely. Napter allows you to perform remote maintenance, troubleshooting, or other typical remote access tasks, without setting up any relay servers or installing agent software on the device.
 
-At this moment, the client is only tested on macOS. It can be built for Linux and Windows but won't work due to `x/crypto/ssh.readVersion` hang. PR's welcome.
+## Tested Platform
+
+At this moment, the client is only tested on folloing platforms. It can be built for other Linux distributions and Windows but might not work due to `x/crypto/ssh.readVersion` hang, etc. PR's welcome.
+
+- DebianGNU/Linux 11 (bullseye) aarch64
+- macOS 13.4.1 (Ventura) arm64
 
 ## Install
 
