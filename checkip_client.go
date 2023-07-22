@@ -2,7 +2,7 @@ package nssh
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -31,7 +31,7 @@ func GetIP() (net.IP, error) {
 		return nil, fmt.Errorf("%s: %s %s", res.Status, req.Method, req.URL)
 	}
 
-	ip, err := ioutil.ReadAll(res.Body)
+	ip, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response from https://checkip.amazonaws.com: %w", err)
 	}
