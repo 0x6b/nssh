@@ -7,7 +7,6 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -332,7 +331,7 @@ func getAuthInfoFromProfile(profileName string) (string, string, string, error) 
 	}
 	path := filepath.Join(dir, profileName+".json")
 
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -376,7 +375,7 @@ func newSSHClientConfig(login string, identity string) (*ssh.ClientConfig, error
 			return nil, err
 		}
 
-		buf, err := ioutil.ReadFile(identity)
+		buf, err := os.ReadFile(identity)
 		if err != nil {
 			return nil, err
 		}
