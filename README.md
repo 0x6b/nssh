@@ -94,15 +94,18 @@ Usage:
   nssh [command]
 
 Available Commands:
+  completion  Generate the autocompletion script for the specified shell
   connect     Connect to specified subscriber via SSH.
   help        Help about any command
-  list        List port mappings for specified subscriber
+  list        List port mappings for specified subscriber. If no subscriber name is specified, list all port mappings.
   version     Show version
 
 Flags:
       --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
   -h, --help                   help for nssh
-      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+      --profile-name string    Specify SORACOM CLI profile name (default "nssh")
+
+Use "nssh [command] --help" for more information about a command.
 ```
 
 Help for `connect` sub-command:
@@ -132,10 +135,10 @@ Help for `list` sub-command:
 
 ```console
 $ nssh list --help
-List port mappings for specified subscriber
+List port mappings for specified subscriber. If no subscriber name is specified, list all port mappings.
 
 Usage:
-  nssh list <subscriber name> [flags]
+  nssh list [subscriber name] [flags]
 
 Aliases:
   list, l
@@ -145,7 +148,7 @@ Flags:
 
 Global Flags:
       --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
-      --profile-name string    Specify SORACOM CLI profile name (default "ssh")
+      --profile-name string    Specify SORACOM CLI profile name (default "nssh")
 ```
 
 ## References

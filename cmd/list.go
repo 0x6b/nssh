@@ -7,12 +7,31 @@ import (
 )
 
 func listCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "list <subscriber name>",
+	listCmd := &cobra.Command{
+		Use:     "list [subscriber name]",
 		Aliases: []string{"l"},
-		Short: "List port mappings for specified subscriber",
-		Args:  cobra.RangeArgs(1, 1),
+		Short:   "List port mappings for specified subscriber. If no subscriber name is specified, list all port mappings.",
+		Args:    cobra.RangeArgs(0, 1),
 		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 {
+				portMappings, err := client.FindPortMappings()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				for _, pm := range portMappings {
+					subscriber, err := client.GetSubscriber(pm.Destination.Imsi)
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+					fmt.Println(subscriber)
+					fmt.Println(pm)
+				}
+				return
+			}
+
 			subscribers, err := client.FindSubscribersByName(args[0])
 			if err != nil {
 				fmt.Println(err)
@@ -38,4 +57,6 @@ func listCmd() *cobra.Command {
 			}
 		},
 	}
+
+	return listCmd
 }
