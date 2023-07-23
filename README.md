@@ -12,6 +12,7 @@ At this moment, the client is only tested on following platforms. It can be buil
 
 - DebianGNU/Linux 11 (bullseye) aarch64
 - macOS 13.4.1 (Ventura) arm64
+- Windows 10 + `cmd.exe` amd64
 
 ## Install
 
