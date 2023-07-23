@@ -8,10 +8,11 @@ Napter is an on-demand networking service for devices using Soracom Air for Cell
 
 ## Tested Platform
 
-At this moment, the client is only tested on folloing platforms. It can be built for other Linux distributions and Windows but might not work due to `x/crypto/ssh.readVersion` hang, etc. PR's welcome.
+At this moment, the client is only tested on following platforms. It can be built for other Linux distributions and Windows but might not work due to `x/crypto/ssh.readVersion` hang, etc. PR's welcome.
 
 - DebianGNU/Linux 11 (bullseye) aarch64
 - macOS 13.4.1 (Ventura) arm64
+- Windows 10 + `cmd.exe` amd64
 
 ## Install
 
@@ -169,7 +170,7 @@ MIT. See [LICENSE](LICENSE) for details.
 This program will send requests to following services:
 
 - https://checkip.amazonaws.com/, to determine your global IP address.
-- https://g.api.soracom.io (Global coverage) or https://api.soracom.io (Japan coverage), to use SORACOM services
+- https://g.api.soracom.io (Global coverage) or https://api.soracom.io (Japan coverage), to use SORACOM services.
 
 Other than that, the program does not send user action/data to any server. Please consult each provider's privacy notices.
 
