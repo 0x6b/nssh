@@ -278,7 +278,9 @@ func (c *SoracomClient) Connect(login, identity string, portMapping *PortMapping
 
 	w, h, err := terminal.GetSize(fd)
 	if err != nil {
-		return err
+		fmt.Println("failed to get terminal size, using default values", err)
+		w = 80
+		h = 24
 	}
 
 	err = session.RequestPty("xterm", h, w, ssh.TerminalModes{
