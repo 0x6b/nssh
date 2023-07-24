@@ -30,6 +30,8 @@ func init() {
 	RootCmd.AddCommand(listCmd())
 	RootCmd.AddCommand(connectCmd())
 	RootCmd.AddCommand(versionCmd())
+
+	RootCmd.CompletionOptions.HiddenDefaultCmd = true
 }
 
 func initConfig() {

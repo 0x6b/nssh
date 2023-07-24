@@ -95,7 +95,6 @@ Usage:
   nssh [command]
 
 Available Commands:
-  completion  Generate the autocompletion script for the specified shell
   connect     Connect to specified subscriber via SSH.
   help        Help about any command
   list        List port mappings for specified subscriber. If no subscriber name is specified, list all port mappings.
