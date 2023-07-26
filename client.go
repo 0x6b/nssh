@@ -47,6 +47,25 @@ func (s Subscriber) String() string {
 	return fmt.Sprintf("%v (%v / %v / %v)", name, s.Imsi, s.Subscription, s.Type)
 }
 
+// Title returns IMSI and name as its title of the subscriber, for interactive command
+func (s Subscriber) Title() string {
+	name := s.Tags.Name
+	if s.Tags.Name == "" {
+		name = "Unknown"
+	}
+	return fmt.Sprintf("%v %v", s.Imsi, name)
+}
+
+// Description returns subscription and type (speed class) as its description of the subscriber, for interactive command
+func (s Subscriber) Description() string {
+	return fmt.Sprintf("%s (%s)", s.Subscription, s.Type)
+}
+
+// FilterValue uses all fields as source of filter value of the subscriber, for interactive command
+func (s Subscriber) FilterValue() string {
+	return fmt.Sprintf("%s%s%s%s", s.Imsi, s.Subscription, s.Tags.Name, s.Type)
+}
+
 // A PortMapping represents SORACOM Napter port mapping
 type PortMapping struct {
 	Duration    int    `json:"duration"`    // duration in seconds
@@ -142,6 +161,24 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error)
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("subscribers?tag_name=name&tag_value=%s", url.QueryEscape(name)),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var Subscribers []Subscriber
+	err = json.NewDecoder(res.Body).Decode(&Subscribers)
+	return Subscribers, err
+}
+
+// FindOnlineSubscribers finds online subscribers
+func (c *SoracomClient) FindOnlineSubscribers() ([]Subscriber, error) {
+	// GET
+	//	https://api.soracom.io/v1/query/sims?limit=100&session_status=ONLINE&search_type=AND
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   "query/subscribers?session_status=ONLINE",
 		body:   "",
 	})
 	if err != nil {
