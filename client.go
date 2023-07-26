@@ -40,7 +40,11 @@ type Subscriber struct {
 }
 
 func (s Subscriber) String() string {
-	return fmt.Sprintf("%v (%v / %v / %v)", s.Tags.Name, s.Imsi, s.Subscription, s.Type)
+	name := s.Tags.Name
+	if s.Tags.Name == "" {
+		name = "Unknown"
+	}
+	return fmt.Sprintf("%v (%v / %v / %v)", name, s.Imsi, s.Subscription, s.Type)
 }
 
 // A PortMapping represents SORACOM Napter port mapping
