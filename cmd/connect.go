@@ -20,7 +20,7 @@ func connectCmd() *cobra.Command {
 			login, name := parseArg(args[0])
 
 			fmt.Printf("nssh: search subscribers named \"%s\"\n", name)
-			onlineSubscribers, err := findOnlineSubscribers(name)
+			onlineSubscribers, err := findOnlineSubscribersByName(name)
 			if err != nil || len(onlineSubscribers) == 0 {
 				fmt.Printf("nssh: → failed to find online subscribers named \"%s\"\n", name)
 				os.Exit(1)
@@ -87,7 +87,7 @@ func parseArg(arg string) (string, string) {
 	return login, name
 }
 
-func findOnlineSubscribers(name string) ([]nssh.Subscriber, error) {
+func findOnlineSubscribersByName(name string) ([]nssh.Subscriber, error) {
 	subscribers, err := client.FindSubscribersByName(name)
 	if err != nil {
 		return nil, err
