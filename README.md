@@ -32,8 +32,8 @@ $ make # and you'll get `nssh` under the root directory
 
 ### One-time Setup
 
-1. Create a SAM user with following permission:
-   ```json
+1. Create a SAM user with following permission (without comment including `//`):
+   ```json5
    {
      "statements": [
        {
@@ -41,7 +41,7 @@ $ make # and you'll get `nssh` under the root directory
            "Subscriber:listSubscribers",
            "PortMapping:listPortMappingsForSubscriber",
            "PortMapping:createPortMapping",
-           "Query:subscribers"
+           "Query:subscribers" // for interactive mode
          ],
          "effect": "allow"
        }
@@ -49,7 +49,7 @@ $ make # and you'll get `nssh` under the root directory
    }
    ```
 2. Generate authentication key for the user.
-3. Save the authentication information at `$HOME/.soracom/nssh.json`, or `%HOMEPATH%\.soracom\ssh.json` as below.
+3. Save the authentication information at `$HOME/.soracom/nssh.json`, or `%HOMEPATH%\.soracom\nssh.json` as below (without comment including `//`).
    ```json5
    {
      "coverageType": "jp", // default coverage, specify "g" for global
