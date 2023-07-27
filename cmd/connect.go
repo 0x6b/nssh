@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/0x6b/nssh"
+	"github.com/0x6b/nssh/models"
 	"github.com/spf13/cobra"
 	"net"
 	"os"
@@ -38,7 +39,7 @@ func connectCmd() *cobra.Command {
 			fmt.Printf("nssh: → found subscriber %s\n", subscriber)
 
 			fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
-			var portMapping *nssh.PortMapping
+			var portMapping *models.PortMapping
 
 			available, err := findPortMappings(subscriber, port)
 			if err != nil || len(available) == 0 {
@@ -87,13 +88,13 @@ func parseArg(arg string) (string, string) {
 	return login, name
 }
 
-func findOnlineSubscribersByName(name string) ([]nssh.Subscriber, error) {
+func findOnlineSubscribersByName(name string) ([]models.Subscriber, error) {
 	subscribers, err := client.FindSubscribersByName(name)
 	if err != nil {
 		return nil, err
 	}
 
-	var onlineSubscribers []nssh.Subscriber
+	var onlineSubscribers []models.Subscriber
 	for _, s := range subscribers {
 		if s.SessionStatus.Online {
 			onlineSubscribers = append(onlineSubscribers, s)
@@ -102,14 +103,14 @@ func findOnlineSubscribersByName(name string) ([]nssh.Subscriber, error) {
 	return onlineSubscribers, nil
 }
 
-func findPortMappings(subscriber nssh.Subscriber, port int) ([]nssh.PortMapping, error) {
+func findPortMappings(subscriber models.Subscriber, port int) ([]models.PortMapping, error) {
 	portMappings, err := client.FindPortMappingsForSubscriber(subscriber)
 	if err != nil {
 		return nil, err
 	}
 
-	var currentPortMappings []nssh.PortMapping
-	var availablePortMappings []nssh.PortMapping
+	var currentPortMappings []models.PortMapping
+	var availablePortMappings []models.PortMapping
 
 	for _, pm := range portMappings {
 		if pm.Destination.Port == port {

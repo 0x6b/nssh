@@ -3,6 +3,7 @@ package nssh
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/0x6b/nssh/models"
 	"github.com/mitchellh/go-homedir"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -24,72 +25,6 @@ type SoracomClient struct {
 	Token    string // API token
 	Client   *http.Client
 	Endpoint string
-}
-
-// A Subscriber represents a SORACOM IoT SIM
-type Subscriber struct {
-	Imsi          string `json:"imsi"`         // IMSI of the subscriber
-	Subscription  string `json:"subscription"` // subscription e.g. plan01s, plan-D
-	SpeedClass    string `json:"type"`         // speed class e.g. s1.4xfast
-	SessionStatus struct {
-		Online bool `json:"online"` // represents subscriber is online or not
-	} `json:"sessionStatus"`
-	Tags struct {
-		Name string `json:"name,omitempty"` // name of the subscriber
-	} `json:"tags"`
-}
-
-func (s Subscriber) String() string {
-	name := s.Tags.Name
-	if s.Tags.Name == "" {
-		name = "Unknown"
-	}
-	return fmt.Sprintf("%v (%v / %v / %v)", name, s.Imsi, s.Subscription, s.SpeedClass)
-}
-
-// Title returns IMSI and name as its title of the subscriber, for interactive command
-func (s Subscriber) Title() string {
-	name := s.Tags.Name
-	if s.Tags.Name == "" {
-		name = "Unknown"
-	}
-	return fmt.Sprintf("%v %v", s.Imsi, name)
-}
-
-// Description returns subscription and type (speed class) as its description of the subscriber, for interactive command
-func (s Subscriber) Description() string {
-	return fmt.Sprintf("%s (%s)", s.Subscription, s.SpeedClass)
-}
-
-// FilterValue uses all fields as source of filter value of the subscriber, for interactive command
-func (s Subscriber) FilterValue() string {
-	return fmt.Sprintf("%s%s%s%s", s.Imsi, s.Subscription, s.Tags.Name, s.SpeedClass)
-}
-
-// A PortMapping represents SORACOM Napter port mapping
-type PortMapping struct {
-	Duration    int    `json:"duration"`    // duration in seconds
-	Endpoint    string `json:"endpoint"`    // SORACOM Napter endpoint
-	Hostname    string `json:"hostname"`    // SORACOM Napter hostname
-	IPAddress   string `json:"ipAddress"`   // SORACOM Napter IP address
-	Port        int    `json:"port"`        // SORACOM Napter port number
-	TLSRequired bool   `json:"tlsRequired"` // is TLS required
-	Destination struct {
-		Imsi string `json:"imsi"` // target IMSI
-		Port int    `json:"port"` // target port
-	} `json:"destination"`
-	Source struct {
-		IPRanges []string `json:"ipRanges"` // permitted source CIDRs
-	} `json:"source"`
-}
-
-func (pm PortMapping) String() string {
-	return fmt.Sprintf("- Endpoint: %v:%v\n"+
-		"- Destination: %v:%v\n"+
-		"- Duration: %v hours\n"+
-		"- Source: %v\n"+
-		"- TLS required: %v",
-		pm.Hostname, pm.Port, pm.Destination.Imsi, pm.Destination.Port, float32(pm.Duration)/60/60, strings.Join(pm.Source.IPRanges, ","), pm.TLSRequired)
 }
 
 type apiParams struct {
@@ -157,7 +92,7 @@ func NewSoracomClient(coverageType, profileName string) (*SoracomClient, error) 
 }
 
 // FindSubscribersByName finds subscribers which has the specified name
-func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error) {
+func (c *SoracomClient) FindSubscribersByName(name string) ([]models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("subscribers?tag_name=name&tag_value=%s", url.QueryEscape(name)),
@@ -167,13 +102,13 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error)
 		return nil, err
 	}
 
-	var Subscribers []Subscriber
+	var Subscribers []models.Subscriber
 	err = json.NewDecoder(res.Body).Decode(&Subscribers)
 	return Subscribers, err
 }
 
 // FindOnlineSubscribers finds online subscribers
-func (c *SoracomClient) FindOnlineSubscribers() ([]Subscriber, error) {
+func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   "query/subscribers?session_status=ONLINE",
@@ -183,13 +118,13 @@ func (c *SoracomClient) FindOnlineSubscribers() ([]Subscriber, error) {
 		return nil, err
 	}
 
-	var Subscribers []Subscriber
+	var Subscribers []models.Subscriber
 	err = json.NewDecoder(res.Body).Decode(&Subscribers)
 	return Subscribers, err
 }
 
 // GetSubscriber gets subscriber information for specified IMSI
-func (c *SoracomClient) GetSubscriber(imsi string) (*Subscriber, error) {
+func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("subscribers/%s", imsi),
@@ -199,14 +134,14 @@ func (c *SoracomClient) GetSubscriber(imsi string) (*Subscriber, error) {
 		return nil, err
 	}
 
-	var subscriber Subscriber
+	var subscriber models.Subscriber
 	err = json.NewDecoder(res.Body).Decode(&subscriber)
 
 	return &subscriber, err
 }
 
 // FindPortMappingsForSubscriber finds port mappings for specified subscriber
-func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber Subscriber) ([]PortMapping, error) {
+func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber models.Subscriber) ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
@@ -216,13 +151,13 @@ func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber Subscriber) ([]
 		return nil, err
 	}
 
-	var portMapping []PortMapping
+	var portMapping []models.PortMapping
 	err = json.NewDecoder(res.Body).Decode(&portMapping)
 	return portMapping, err
 }
 
 // FindPortMappings finds all port mappings
-func (c *SoracomClient) FindPortMappings() ([]PortMapping, error) {
+func (c *SoracomClient) FindPortMappings() ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   "port_mappings",
@@ -232,14 +167,14 @@ func (c *SoracomClient) FindPortMappings() ([]PortMapping, error) {
 		return nil, err
 	}
 
-	var portMapping []PortMapping
+	var portMapping []models.PortMapping
 	err = json.NewDecoder(res.Body).Decode(&portMapping)
 	return portMapping, err
 }
 
 // CreatePortMappingsForSubscriber creates port mappings for specified
 // subscriber, port, and duration
-func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber Subscriber, port, duration int) (*PortMapping, error) {
+func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber models.Subscriber, port, duration int) (*models.PortMapping, error) {
 	body, err := json.Marshal(struct {
 		Duration    int  `json:"duration"`
 		TLSRequired bool `json:"tlsRequired"`
@@ -271,7 +206,7 @@ func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber Subscriber, p
 		return nil, err
 	}
 
-	var portMapping PortMapping
+	var portMapping models.PortMapping
 	err = json.NewDecoder(res.Body).Decode(&portMapping)
 	return &portMapping, err
 }
@@ -279,7 +214,7 @@ func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber Subscriber, p
 // Connect connects to specified port mapping with login name and identity. If
 // identity is specified, use it for public key authentication. If not, use
 // password authentication instead.
-func (c *SoracomClient) Connect(login, identity string, portMapping *PortMapping) error {
+func (c *SoracomClient) Connect(login, identity string, portMapping *models.PortMapping) error {
 	sshConfig, err := newSSHClientConfig(login, identity)
 	if err != nil {
 		return err

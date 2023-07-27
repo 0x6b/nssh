@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/0x6b/nssh"
+	"github.com/0x6b/nssh/models"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -15,7 +15,7 @@ var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type model struct {
 	list   list.Model
-	choice *nssh.Subscriber
+	choice *models.Subscriber
 }
 
 func (m model) Init() tea.Cmd {
@@ -29,7 +29,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "esc", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			s, ok := m.list.SelectedItem().(nssh.Subscriber)
+			s, ok := m.list.SelectedItem().(models.Subscriber)
 			if ok {
 				m.choice = &s
 			}
@@ -49,7 +49,7 @@ func (m model) View() string {
 	return docStyle.Render(m.list.View())
 }
 
-func (m model) Choice() *nssh.Subscriber {
+func (m model) Choice() *models.Subscriber {
 	return m.choice
 }
 
@@ -96,7 +96,7 @@ func interactiveCmd() *cobra.Command {
 
 			if subscriber := result.(model).Choice(); subscriber != nil {
 				fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
-				var portMapping *nssh.PortMapping
+				var portMapping *models.PortMapping
 
 				available, err := findPortMappings(*subscriber, port)
 				if err != nil || len(available) == 0 {
