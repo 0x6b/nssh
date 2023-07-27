@@ -174,8 +174,6 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]Subscriber, error)
 
 // FindOnlineSubscribers finds online subscribers
 func (c *SoracomClient) FindOnlineSubscribers() ([]Subscriber, error) {
-	// GET
-	//	https://api.soracom.io/v1/query/sims?limit=100&session_status=ONLINE&search_type=AND
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   "query/subscribers?session_status=ONLINE",

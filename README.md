@@ -82,6 +82,11 @@ You can specify coverage type, profile name, port number, connection duration, o
   ```console
   $ nssh connect pi@your-sim-name --port 2222 --duration 120
   ```
+- Select online subscriber to connect interactively:
+  ```console
+  $ nssh interactive -u pi -i ~/.ssh/id_rsa
+  ```
+  Online subscriber list will be shown, then select one of them by navigating with arrow keys or filtering by typing <kbd>/</kbd>. Press <kbd>enter</kbd> to connect, or <kbd>esc</kbd>/<kbd>Ctrl+c</kbd>/<kbd>q</kbd> to quit.
 
 ### Details
 
@@ -97,6 +102,7 @@ Usage:
 Available Commands:
   connect     Connect to specified subscriber via SSH.
   help        Help about any command
+  interactive List online subscribers and select one of them to connect, interactively.
   list        List port mappings for specified subscriber. If no subscriber name is specified, list all port mappings.
   version     Show version
 
@@ -145,6 +151,29 @@ Aliases:
 
 Flags:
   -h, --help   help for list
+
+Global Flags:
+      --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan
+      --profile-name string    Specify SORACOM CLI profile name (default "nssh")
+```
+
+Help for `interactive` sub-command:
+
+```console
+List online subscribers and select one of them to connect, interactively.
+
+Usage:
+  nssh interactive [flags]
+
+Aliases:
+  interactive, i
+
+Flags:
+  -d, --duration int      Specify session duration in minutes (default 60)
+  -h, --help              help for interactive
+  -i, --identity string   Specify a path to file from which the identity for public key authentication is read
+  -u, --login string      Specify login user name (default "pi")
+  -p, --port int          Specify port number to connect (default 22)
 
 Global Flags:
       --coverage-type string   Specify coverage type, "g" for Global, "jp" for Japan

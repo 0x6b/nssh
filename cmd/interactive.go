@@ -59,7 +59,7 @@ func interactiveCmd() *cobra.Command {
 	interactiveCmd := &cobra.Command{
 		Use:     "interactive",
 		Aliases: []string{"i"},
-		Short:   "Interactive mode",
+		Short:   "List online subscribers and select one of them to connect, interactively.",
 		Run: func(cmd *cobra.Command, args []string) {
 			subscribers, err := client.FindOnlineSubscribers()
 			if err != nil {
