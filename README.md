@@ -40,7 +40,8 @@ $ make # and you'll get `nssh` under the root directory
          "api": [
            "Subscriber:listSubscribers",
            "PortMapping:listPortMappingsForSubscriber",
-           "PortMapping:createPortMapping"
+           "PortMapping:createPortMapping",
+           "Query:subscribers"
          ],
          "effect": "allow"
        }
