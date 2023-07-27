@@ -70,7 +70,7 @@ func interactiveCmd() *cobra.Command {
 			items := make([]list.Item, 0)
 
 			for _, s := range subscribers {
-				if s.Imsi != "" && s.Subscription != "" && s.Type != "" {
+				if s.Imsi != "" && s.Subscription != "" && s.SpeedClass != "" {
 					items = append(items, s)
 				}
 			}
