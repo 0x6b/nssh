@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -107,6 +108,22 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]models.Subscriber,
 	return Subscribers, err
 }
 
+// FindOnlineSubscribersByName finds online subscribers which has the specified name
+func (c *SoracomClient) FindOnlineSubscribersByName(name string) ([]models.Subscriber, error) {
+	subscribers, err := c.FindSubscribersByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	var onlineSubscribers []models.Subscriber
+	for _, s := range subscribers {
+		if s.SessionStatus.Online {
+			onlineSubscribers = append(onlineSubscribers, s)
+		}
+	}
+	return onlineSubscribers, nil
+}
+
 // FindOnlineSubscribers finds online subscribers
 func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
@@ -170,6 +187,44 @@ func (c *SoracomClient) FindPortMappings() ([]models.PortMapping, error) {
 	var portMapping []models.PortMapping
 	err = json.NewDecoder(res.Body).Decode(&portMapping)
 	return portMapping, err
+}
+
+// FindAvailablePortMappings finds available port mappings for specified subscriber and port
+func (c *SoracomClient) FindAvailablePortMappings(subscriber models.Subscriber, port int) ([]models.PortMapping, error) {
+	portMappings, err := c.FindPortMappingsForSubscriber(subscriber)
+	if err != nil {
+		return nil, err
+	}
+
+	var currentPortMappings []models.PortMapping
+	var availablePortMappings []models.PortMapping
+
+	for _, pm := range portMappings {
+		if pm.Destination.Port == port {
+			currentPortMappings = append(currentPortMappings, pm)
+		}
+	}
+
+	if len(currentPortMappings) > 0 {
+		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), subscriber.Imsi, port)
+		ip, err := GetIP()
+
+		// search port mappings which allows being connected from current IP address
+		if err == nil { // ignore https://checkip.amazonaws.com/ error
+			fmt.Printf("nssh: → check allowed CIDR for current IP address is %s\n", ip)
+			for _, pm := range currentPortMappings {
+				for _, r := range pm.Source.IPRanges {
+					_, ipNet, err := net.ParseCIDR(r)
+					if err == nil {
+						if ipNet.Contains(ip) {
+							availablePortMappings = append(availablePortMappings, pm)
+						}
+					}
+				}
+			}
+		}
+	}
+	return availablePortMappings, nil
 }
 
 // CreatePortMappingsForSubscriber creates port mappings for specified

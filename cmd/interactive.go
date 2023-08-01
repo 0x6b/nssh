@@ -98,7 +98,7 @@ func interactiveCmd() *cobra.Command {
 				fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
 				var portMapping *models.PortMapping
 
-				available, err := findPortMappings(*subscriber, port)
+				available, err := client.FindAvailablePortMappings(*subscriber, port)
 				if err != nil || len(available) == 0 {
 					fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", subscriber.Imsi, port)
 					portMapping, err = client.CreatePortMappingsForSubscriber(*subscriber, port, duration)
