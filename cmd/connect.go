@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/0x6b/nssh"
+	"github.com/0x6b/nssh/models"
 	"github.com/spf13/cobra"
-	"net"
 	"os"
 	"strings"
 )
@@ -20,7 +19,7 @@ func connectCmd() *cobra.Command {
 			login, name := parseArg(args[0])
 
 			fmt.Printf("nssh: search subscribers named \"%s\"\n", name)
-			onlineSubscribers, err := findOnlineSubscribersByName(name)
+			onlineSubscribers, err := client.FindOnlineSubscribersByName(name)
 			if err != nil || len(onlineSubscribers) == 0 {
 				fmt.Printf("nssh: → failed to find online subscribers named \"%s\"\n", name)
 				os.Exit(1)
@@ -38,9 +37,9 @@ func connectCmd() *cobra.Command {
 			fmt.Printf("nssh: → found subscriber %s\n", subscriber)
 
 			fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
-			var portMapping *nssh.PortMapping
+			var portMapping *models.PortMapping
 
-			available, err := findPortMappings(subscriber, port)
+			available, err := client.FindAvailablePortMappings(subscriber, port)
 			if err != nil || len(available) == 0 {
 				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", subscriber.Imsi, port)
 				portMapping, err = client.CreatePortMappingsForSubscriber(subscriber, port, duration)
@@ -85,56 +84,4 @@ func parseArg(arg string) (string, string) {
 		name = arg
 	}
 	return login, name
-}
-
-func findOnlineSubscribersByName(name string) ([]nssh.Subscriber, error) {
-	subscribers, err := client.FindSubscribersByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	var onlineSubscribers []nssh.Subscriber
-	for _, s := range subscribers {
-		if s.SessionStatus.Online {
-			onlineSubscribers = append(onlineSubscribers, s)
-		}
-	}
-	return onlineSubscribers, nil
-}
-
-func findPortMappings(subscriber nssh.Subscriber, port int) ([]nssh.PortMapping, error) {
-	portMappings, err := client.FindPortMappingsForSubscriber(subscriber)
-	if err != nil {
-		return nil, err
-	}
-
-	var currentPortMappings []nssh.PortMapping
-	var availablePortMappings []nssh.PortMapping
-
-	for _, pm := range portMappings {
-		if pm.Destination.Port == port {
-			currentPortMappings = append(currentPortMappings, pm)
-		}
-	}
-
-	if len(currentPortMappings) > 0 {
-		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), subscriber.Imsi, port)
-		ip, err := nssh.GetIP()
-
-		// search port mappings which allows being connected from current IP address
-		if err == nil { // ignore https://checkip.amazonaws.com/ error
-			fmt.Printf("nssh: → check allowed CIDR for current IP address is %s\n", ip)
-			for _, pm := range currentPortMappings {
-				for _, r := range pm.Source.IPRanges {
-					_, ipNet, err := net.ParseCIDR(r)
-					if err == nil {
-						if ipNet.Contains(ip) {
-							availablePortMappings = append(availablePortMappings, pm)
-						}
-					}
-				}
-			}
-		}
-	}
-	return availablePortMappings, nil
 }
