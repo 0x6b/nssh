@@ -39,10 +39,10 @@ func connectCmd() *cobra.Command {
 			fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
 			var portMapping *models.PortMapping
 
-			available, err := client.FindAvailablePortMappings(subscriber, port)
+			available, err := client.FindAvailablePortMappingsForSubscriber(subscriber, port)
 			if err != nil || len(available) == 0 {
 				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", subscriber.Imsi, port)
-				portMapping, err = client.CreatePortMappingsForSubscriber(subscriber, port, duration)
+				portMapping, err = client.CreatePortMappingForSubscriber(subscriber, port, duration)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
