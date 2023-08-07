@@ -108,22 +108,6 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]models.Subscriber,
 	return Subscribers, err
 }
 
-// FindOnlineSubscribersByName finds online subscribers which has the specified name
-func (c *SoracomClient) FindOnlineSubscribersByName(name string) ([]models.Subscriber, error) {
-	subscribers, err := c.FindSubscribersByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	var onlineSubscribers []models.Subscriber
-	for _, s := range subscribers {
-		if s.SessionStatus.Online {
-			onlineSubscribers = append(onlineSubscribers, s)
-		}
-	}
-	return onlineSubscribers, nil
-}
-
 // FindOnlineSubscribers finds online subscribers
 func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
@@ -138,6 +122,22 @@ func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 	var Subscribers []models.Subscriber
 	err = json.NewDecoder(res.Body).Decode(&Subscribers)
 	return Subscribers, err
+}
+
+// FindOnlineSubscribersByName finds online subscribers which has the specified name
+func (c *SoracomClient) FindOnlineSubscribersByName(name string) ([]models.Subscriber, error) {
+	subscribers, err := c.FindSubscribersByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	var onlineSubscribers []models.Subscriber
+	for _, s := range subscribers {
+		if s.SessionStatus.Online {
+			onlineSubscribers = append(onlineSubscribers, s)
+		}
+	}
+	return onlineSubscribers, nil
 }
 
 // GetSubscriber gets subscriber information for specified IMSI
@@ -157,22 +157,6 @@ func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
 	return &subscriber, err
 }
 
-// FindPortMappingsForSubscriber finds port mappings for specified subscriber
-func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber models.Subscriber) ([]models.PortMapping, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var portMapping []models.PortMapping
-	err = json.NewDecoder(res.Body).Decode(&portMapping)
-	return portMapping, err
-}
-
 // FindPortMappings finds all port mappings
 func (c *SoracomClient) FindPortMappings() ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
@@ -189,8 +173,24 @@ func (c *SoracomClient) FindPortMappings() ([]models.PortMapping, error) {
 	return portMapping, err
 }
 
-// FindAvailablePortMappings finds available port mappings for specified subscriber and port
-func (c *SoracomClient) FindAvailablePortMappings(subscriber models.Subscriber, port int) ([]models.PortMapping, error) {
+// FindPortMappingsForSubscriber finds port mappings for specified subscriber
+func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber models.Subscriber) ([]models.PortMapping, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var portMapping []models.PortMapping
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return portMapping, err
+}
+
+// FindAvailablePortMappingsForSubscriber finds available port mappings for specified subscriber and port
+func (c *SoracomClient) FindAvailablePortMappingsForSubscriber(subscriber models.Subscriber, port int) ([]models.PortMapping, error) {
 	portMappings, err := c.FindPortMappingsForSubscriber(subscriber)
 	if err != nil {
 		return nil, err
@@ -227,9 +227,9 @@ func (c *SoracomClient) FindAvailablePortMappings(subscriber models.Subscriber, 
 	return availablePortMappings, nil
 }
 
-// CreatePortMappingsForSubscriber creates port mappings for specified
+// CreatePortMappingForSubscriber creates port mappings for specified
 // subscriber, port, and duration
-func (c *SoracomClient) CreatePortMappingsForSubscriber(subscriber models.Subscriber, port, duration int) (*models.PortMapping, error) {
+func (c *SoracomClient) CreatePortMappingForSubscriber(subscriber models.Subscriber, port, duration int) (*models.PortMapping, error) {
 	body, err := json.Marshal(struct {
 		Duration    int  `json:"duration"`
 		TLSRequired bool `json:"tlsRequired"`
