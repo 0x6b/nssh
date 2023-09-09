@@ -52,7 +52,7 @@ func connectCmd() *cobra.Command {
 				fmt.Printf("nssh: → found available port mapping:\n%s\n", portMapping)
 			}
 
-			fmt.Printf("nssh: connect to %s:%d using the port mapping\n", sim.SimID, port)
+			fmt.Printf("nssh: connect to %s@%s:%d using the port mapping\n", login, sim.SimID, port)
 			fmt.Println(strings.Repeat("-", 40))
 			err = client.Connect(login, identity, portMapping)
 			if err != nil {
