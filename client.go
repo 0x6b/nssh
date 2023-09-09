@@ -204,7 +204,7 @@ func (c *SoracomClient) ListPortMappings() ([]models.PortMapping, error) {
 func (c *SoracomClient) FindPortMappingsForSIM(sim models.SIM) ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
-		path:   fmt.Sprintf("port_mappings/sims/%s", sim.SimID),
+		path:   fmt.Sprintf("port_mappings/sims/%s", sim.ID),
 		body:   "",
 	})
 	if err != nil {
@@ -233,7 +233,7 @@ func (c *SoracomClient) FindAvailablePortMappingsForSIM(sim models.SIM, port int
 	}
 
 	if len(currentPortMappings) > 0 {
-		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), sim.SimID, port)
+		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), sim.ID, port)
 		ip, err := GetIP()
 
 		// search port mappings which allows being connected from current IP address
@@ -261,18 +261,18 @@ func (c *SoracomClient) CreatePortMappingForSIM(sim models.SIM, port, duration i
 		Duration    int  `json:"duration"`
 		TLSRequired bool `json:"tlsRequired"`
 		Destination struct {
-			SimID string `json:"simId"`
-			Port  int    `json:"port"`
+			ID   string `json:"simId"`
+			Port int    `json:"port"`
 		} `json:"destination"`
 	}{
 		Duration:    duration * 60,
 		TLSRequired: false,
 		Destination: struct {
-			SimID string `json:"simId"`
-			Port  int    `json:"port"`
+			ID   string `json:"simId"`
+			Port int    `json:"port"`
 		}{
-			SimID: sim.SimID,
-			Port:  port,
+			ID:   sim.ID,
+			Port: port,
 		},
 	})
 	if err != nil {

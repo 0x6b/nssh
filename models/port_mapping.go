@@ -14,8 +14,8 @@ type PortMapping struct {
 	Port        int    `json:"port"`        // SORACOM Napter port number
 	TLSRequired bool   `json:"tlsRequired"` // is TLS required
 	Destination struct {
-		SimID string `json:"simId"` // target SIM ID
-		Port  int    `json:"port"`  // target port
+		ID   string `json:"simId"` // target SIM ID
+		Port int    `json:"port"`  // target port
 	} `json:"destination"`
 	Source struct {
 		IPRanges []string `json:"ipRanges"` // permitted source CIDRs
@@ -28,5 +28,5 @@ func (pm PortMapping) String() string {
 		"- Duration: %v hours\n"+
 		"- Source: %v\n"+
 		"- TLS required: %v",
-		pm.Hostname, pm.Port, pm.Destination.SimID, pm.Destination.Port, float32(pm.Duration)/60/60, strings.Join(pm.Source.IPRanges, ","), pm.TLSRequired)
+		pm.Hostname, pm.Port, pm.Destination.ID, pm.Destination.Port, float32(pm.Duration)/60/60, strings.Join(pm.Source.IPRanges, ","), pm.TLSRequired)
 }

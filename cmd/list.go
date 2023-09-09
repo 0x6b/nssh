@@ -21,7 +21,7 @@ func listCmd() *cobra.Command {
 				}
 
 				for _, pm := range portMappings {
-					sim, err := client.GetSIM(pm.Destination.SimID)
+					sim, err := client.GetSIM(pm.Destination.ID)
 					if err != nil {
 						fmt.Println(err)
 						os.Exit(1)

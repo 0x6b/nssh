@@ -36,12 +36,12 @@ func connectCmd() *cobra.Command {
 			sim := onlineSIMs[0]
 			fmt.Printf("nssh: → found SIM %s\n", sim)
 
-			fmt.Printf("nssh: search existing port mappings for %s:%d\n", sim.SimID, port)
+			fmt.Printf("nssh: search existing port mappings for %s:%d\n", sim.ID, port)
 			var portMapping *models.PortMapping
 
 			available, err := client.FindAvailablePortMappingsForSIM(sim, port)
 			if err != nil || len(available) == 0 {
-				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", sim.SimID, port)
+				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", sim.ID, port)
 				portMapping, err = client.CreatePortMappingForSIM(sim, port, duration)
 				if err != nil {
 					fmt.Println(err)
@@ -52,7 +52,7 @@ func connectCmd() *cobra.Command {
 				fmt.Printf("nssh: → found available port mapping:\n%s\n", portMapping)
 			}
 
-			fmt.Printf("nssh: connect to %s@%s:%d using the port mapping\n", login, sim.SimID, port)
+			fmt.Printf("nssh: connect to %s@%s:%d using the port mapping\n", login, sim.ID, port)
 			fmt.Println(strings.Repeat("-", 40))
 			err = client.Connect(login, identity, portMapping)
 			if err != nil {

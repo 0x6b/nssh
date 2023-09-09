@@ -70,7 +70,7 @@ func interactiveCmd() *cobra.Command {
 			items := make([]list.Item, 0)
 
 			for _, s := range sims {
-				if s.SimID != "" && s.ActiveSubscription() != "" && s.SpeedClass != "" {
+				if s.ID != "" && s.ActiveSubscription() != "" && s.SpeedClass != "" {
 					items = append(items, s)
 				}
 			}
@@ -95,12 +95,12 @@ func interactiveCmd() *cobra.Command {
 			}
 
 			if sim := result.(model).Choice(); sim != nil {
-				fmt.Printf("nssh: search existing port mappings for %s:%d\n", sim.SimID, port)
+				fmt.Printf("nssh: search existing port mappings for %s:%d\n", sim.ID, port)
 				var portMapping *models.PortMapping
 
 				available, err := client.FindAvailablePortMappingsForSIM(*sim, port)
 				if err != nil || len(available) == 0 {
-					fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", sim.SimID, port)
+					fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", sim.ID, port)
 					portMapping, err = client.CreatePortMappingForSIM(*sim, port, duration)
 					if err != nil {
 						fmt.Println(err)
@@ -111,7 +111,7 @@ func interactiveCmd() *cobra.Command {
 					fmt.Printf("nssh: → found available port mapping:\n%s\n", portMapping)
 				}
 
-				fmt.Printf("nssh: connect to %s@%s:%d using the port mapping\n", login, sim.SimID, port)
+				fmt.Printf("nssh: connect to %s@%s:%d using the port mapping\n", login, sim.ID, port)
 				fmt.Println(strings.Repeat("-", 40))
 				err = client.Connect(login, identity, portMapping)
 				if err != nil {
