@@ -228,6 +228,27 @@ func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
 	return &subscriber, err
 }
 
+// GetSIM gets SIM information for specified SIM ID
+func (c *SoracomClient) GetSIM(simID string) (*models.SIM, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   fmt.Sprintf("query/sims?limit=1&sim_id=%s", simID),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var sims []models.SIM
+	err = json.NewDecoder(res.Body).Decode(&sims)
+
+	if len(sims) == 0 {
+		return nil, fmt.Errorf("SIM not found: %s", simID)
+	}
+
+	return &sims[0], err
+}
+
 // ListPortMappings finds all port mappings
 func (c *SoracomClient) ListPortMappings() ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
