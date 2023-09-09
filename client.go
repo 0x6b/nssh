@@ -142,18 +142,41 @@ func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 
 // FindOnlineSIMs finds online subscribers
 func (c *SoracomClient) FindOnlineSIMs() ([]models.SIM, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   "query/sims?limit=100&session_status=ONLINE&search_type=AND",
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
+	var results []models.SIM
+	var lastEvaluatedKey string
+	var path string
+
+	for {
+		if lastEvaluatedKey != "" {
+			path = fmt.Sprintf("query/sims?limit=100&session_status=ONLINE&search_type=AND&last_evaluated_key=%s", lastEvaluatedKey)
+		} else {
+			path = fmt.Sprintf("query/sims?limit=100&session_status=ONLINE&search_type=AND")
+		}
+		res, err := c.callAPI(&apiParams{
+			method: "GET",
+			path:   path,
+			body:   "",
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		var sims []models.SIM
+		err = json.NewDecoder(res.Body).Decode(&sims)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, sims...)
+
+		nextKey := res.Header.Get("X-Soracom-Next-Key")
+		if nextKey != "" {
+			lastEvaluatedKey = nextKey
+		} else {
+			break
+		}
 	}
 
-	var sims []models.SIM
-	err = json.NewDecoder(res.Body).Decode(&sims)
-	return sims, err
+	return results, nil
 }
 
 // FindOnlineSubscribersByName finds online subscribers which has the specified name
