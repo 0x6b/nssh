@@ -30,7 +30,7 @@ func (s SIM) String() string {
 		name = "Unknown"
 	}
 
-	return fmt.Sprintf("%v (%v / %v / %v)", name, s.SimID, s.getActiveSubscription(), s.SpeedClass)
+	return fmt.Sprintf("%v (%v / %v / %v)", name, s.SimID, s.ActiveSubscription(), s.SpeedClass)
 }
 
 // Title returns SIM ID and name as its title of the SIM, for interactive command
@@ -44,15 +44,15 @@ func (s SIM) Title() string {
 
 // Description returns subscription and type (speed class) as its description of the SIM, for interactive command
 func (s SIM) Description() string {
-	return fmt.Sprintf("%s (%s)", s.getActiveSubscription(), s.SpeedClass)
+	return fmt.Sprintf("%s (%s)", s.ActiveSubscription(), s.SpeedClass)
 }
 
 // FilterValue uses all fields as source of filter value of the SIM, for interactive command
 func (s SIM) FilterValue() string {
-	return fmt.Sprintf("%s%s%s%s", s.SimID, s.getActiveSubscription(), s.Tags.Name, s.SpeedClass)
+	return fmt.Sprintf("%s%s%s%s", s.SimID, s.ActiveSubscription(), s.Tags.Name, s.SpeedClass)
 }
 
-func (s SIM) getActiveSubscription() string {
+func (s SIM) ActiveSubscription() string {
 	activeProfile := s.Profiles[s.ActiveProfileID]
 	primaryImsi := activeProfile.PrimaryImsi
 	return activeProfile.Subscribers[primaryImsi].Subscription
