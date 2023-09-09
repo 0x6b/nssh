@@ -156,6 +156,22 @@ func (c *SoracomClient) FindOnlineSubscribersByName(name string) ([]models.Subsc
 	return onlineSubscribers, nil
 }
 
+// FindOnlineSIMsByName finds online SIMs which has the specified name
+func (c *SoracomClient) FindOnlineSIMsByName(name string) ([]models.SIM, error) {
+	sims, err := c.FindSIMsByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	var onlineSIMs []models.SIM
+	for _, s := range sims {
+		if s.SessionStatus.Online {
+			onlineSIMs = append(onlineSIMs, s)
+		}
+	}
+	return onlineSIMs, nil
+}
+
 // GetSubscriber gets subscriber information for specified IMSI
 func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
@@ -259,6 +275,44 @@ func (c *SoracomClient) FindAvailablePortMappingsForSubscriber(subscriber models
 	return availablePortMappings, nil
 }
 
+// FindAvailablePortMappingsForSIM finds available port mappings for specified SIM and port
+func (c *SoracomClient) FindAvailablePortMappingsForSIM(sim models.SIM, port int) ([]models.PortMapping, error) {
+	portMappings, err := c.FindPortMappingsForSIM(sim)
+	if err != nil {
+		return nil, err
+	}
+
+	var currentPortMappings []models.PortMapping
+	var availablePortMappings []models.PortMapping
+
+	for _, pm := range portMappings {
+		if pm.Destination.Port == port {
+			currentPortMappings = append(currentPortMappings, pm)
+		}
+	}
+
+	if len(currentPortMappings) > 0 {
+		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), sim.SimID, port)
+		ip, err := GetIP()
+
+		// search port mappings which allows being connected from current IP address
+		if err == nil { // ignore https://checkip.amazonaws.com/ error
+			fmt.Printf("nssh: → check allowed CIDR for current IP address is %s\n", ip)
+			for _, pm := range currentPortMappings {
+				for _, r := range pm.Source.IPRanges {
+					_, ipNet, err := net.ParseCIDR(r)
+					if err == nil {
+						if ipNet.Contains(ip) {
+							availablePortMappings = append(availablePortMappings, pm)
+						}
+					}
+				}
+			}
+		}
+	}
+	return availablePortMappings, nil
+}
+
 // CreatePortMappingForSubscriber creates port mappings for specified
 // subscriber, port, and duration
 func (c *SoracomClient) CreatePortMappingForSubscriber(subscriber models.Subscriber, port, duration int) (*models.PortMapping, error) {
@@ -278,6 +332,45 @@ func (c *SoracomClient) CreatePortMappingForSubscriber(subscriber models.Subscri
 		}{
 			Imsi: subscriber.Imsi,
 			Port: port,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.callAPI(&apiParams{
+		method: "POST",
+		path:   "port_mappings",
+		body:   string(body),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var portMapping models.PortMapping
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return &portMapping, err
+}
+
+// CreatePortMappingForSIM creates port mappings for specified
+// subscriber, port, and duration
+func (c *SoracomClient) CreatePortMappingForSIM(sim models.SIM, port, duration int) (*models.PortMapping, error) {
+	body, err := json.Marshal(struct {
+		Duration    int  `json:"duration"`
+		TLSRequired bool `json:"tlsRequired"`
+		Destination struct {
+			SimID string `json:"simId"`
+			Port  int    `json:"port"`
+		} `json:"destination"`
+	}{
+		Duration:    duration * 60,
+		TLSRequired: false,
+		Destination: struct {
+			SimID string `json:"simId"`
+			Port  int    `json:"port"`
+		}{
+			SimID: sim.SimID,
+			Port:  port,
 		},
 	})
 	if err != nil {

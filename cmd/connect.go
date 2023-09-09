@@ -19,30 +19,30 @@ func connectCmd() *cobra.Command {
 			login, name := parseArg(args[0])
 
 			fmt.Printf("nssh: search subscribers named \"%s\"\n", name)
-			onlineSubscribers, err := client.FindOnlineSubscribersByName(name)
-			if err != nil || len(onlineSubscribers) == 0 {
+			onlineSIMs, err := client.FindOnlineSIMsByName(name)
+			if err != nil || len(onlineSIMs) == 0 {
 				fmt.Printf("nssh: → failed to find online subscribers named \"%s\"\n", name)
 				os.Exit(1)
 			}
 
-			if len(onlineSubscribers) > 1 {
+			if len(onlineSIMs) > 1 {
 				fmt.Printf("nssh: → cannot create port mapping as there are multiple subscribers named \"%s\"\n", name)
-				for _, s := range onlineSubscribers {
+				for _, s := range onlineSIMs {
 					fmt.Printf("nssh: - %s\n", s)
 				}
 				os.Exit(1)
 			}
 
-			subscriber := onlineSubscribers[0]
-			fmt.Printf("nssh: → found subscriber %s\n", subscriber)
+			sim := onlineSIMs[0]
+			fmt.Printf("nssh: → found SIM %s\n", sim)
 
-			fmt.Printf("nssh: search existing port mappings for %s:%d\n", subscriber.Imsi, port)
+			fmt.Printf("nssh: search existing port mappings for %s:%d\n", sim.SimID, port)
 			var portMapping *models.PortMapping
 
-			available, err := client.FindAvailablePortMappingsForSubscriber(subscriber, port)
+			available, err := client.FindAvailablePortMappingsForSIM(sim, port)
 			if err != nil || len(available) == 0 {
-				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", subscriber.Imsi, port)
-				portMapping, err = client.CreatePortMappingForSubscriber(subscriber, port, duration)
+				fmt.Printf("nssh: → no existing port mapping for %s:%d, creating\n", sim.SimID, port)
+				portMapping, err = client.CreatePortMappingForSIM(sim, port, duration)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
@@ -52,7 +52,7 @@ func connectCmd() *cobra.Command {
 				fmt.Printf("nssh: → found available port mapping:\n%s\n", portMapping)
 			}
 
-			fmt.Printf("nssh: connect to %s:%d using the port mapping\n", subscriber.Imsi, port)
+			fmt.Printf("nssh: connect to %s:%d using the port mapping\n", sim.SimID, port)
 			fmt.Println(strings.Repeat("-", 40))
 			err = client.Connect(login, identity, portMapping)
 			if err != nil {
