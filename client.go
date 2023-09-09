@@ -108,6 +108,22 @@ func (c *SoracomClient) FindSubscribersByName(name string) ([]models.Subscriber,
 	return Subscribers, err
 }
 
+// FindSIMsByName finds SIMs which has the specified name
+func (c *SoracomClient) FindSIMsByName(name string) ([]models.SIM, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   fmt.Sprintf("query/sims?name=%s", url.QueryEscape(name)),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var sims []models.SIM
+	err = json.NewDecoder(res.Body).Decode(&sims)
+	return sims, err
+}
+
 // FindOnlineSubscribers finds online subscribers
 func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
 	res, err := c.callAPI(&apiParams{
@@ -178,6 +194,22 @@ func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber models.Subscrib
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
+		body:   "",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var portMapping []models.PortMapping
+	err = json.NewDecoder(res.Body).Decode(&portMapping)
+	return portMapping, err
+}
+
+// FindPortMappingsForSIM finds port mappings for specified SIM
+func (c *SoracomClient) FindPortMappingsForSIM(sim models.SIM) ([]models.PortMapping, error) {
+	res, err := c.callAPI(&apiParams{
+		method: "GET",
+		path:   fmt.Sprintf("port_mappings/sims/%s", sim.SimID),
 		body:   "",
 	})
 	if err != nil {

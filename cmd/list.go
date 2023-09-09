@@ -21,25 +21,25 @@ func listCmd() *cobra.Command {
 				}
 
 				for _, pm := range portMappings {
-					subscriber, err := client.GetSubscriber(pm.Destination.Imsi)
+					sim, err := client.GetSIM(pm.Destination.Imsi)
 					if err != nil {
 						fmt.Println(err)
 						os.Exit(1)
 					}
-					fmt.Println(subscriber)
+					fmt.Println(sim)
 					fmt.Println(pm)
 				}
 				return
 			}
 
-			subscribers, err := client.FindSubscribersByName(args[0])
+			sims, err := client.FindSIMsByName(args[0])
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 
-			for _, s := range subscribers {
-				portMappings, err := client.FindPortMappingsForSubscriber(s)
+			for _, s := range sims {
+				portMappings, err := client.FindPortMappingsForSIM(s)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
