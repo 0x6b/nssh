@@ -92,22 +92,6 @@ func NewSoracomClient(coverageType, profileName string) (*SoracomClient, error) 
 	return &c, nil
 }
 
-// FindSubscribersByName finds subscribers which has the specified name
-func (c *SoracomClient) FindSubscribersByName(name string) ([]models.Subscriber, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   fmt.Sprintf("subscribers?tag_name=name&tag_value=%s", url.QueryEscape(name)),
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var Subscribers []models.Subscriber
-	err = json.NewDecoder(res.Body).Decode(&Subscribers)
-	return Subscribers, err
-}
-
 // FindSIMsByName finds SIMs which has the specified name
 func (c *SoracomClient) FindSIMsByName(name string) ([]models.SIM, error) {
 	res, err := c.callAPI(&apiParams{
@@ -122,22 +106,6 @@ func (c *SoracomClient) FindSIMsByName(name string) ([]models.SIM, error) {
 	var sims []models.SIM
 	err = json.NewDecoder(res.Body).Decode(&sims)
 	return sims, err
-}
-
-// FindOnlineSubscribers finds online subscribers
-func (c *SoracomClient) FindOnlineSubscribers() ([]models.Subscriber, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   "query/subscribers?session_status=ONLINE",
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var Subscribers []models.Subscriber
-	err = json.NewDecoder(res.Body).Decode(&Subscribers)
-	return Subscribers, err
 }
 
 // FindOnlineSIMs finds online subscribers
@@ -179,22 +147,6 @@ func (c *SoracomClient) FindOnlineSIMs() ([]models.SIM, error) {
 	return results, nil
 }
 
-// FindOnlineSubscribersByName finds online subscribers which has the specified name
-func (c *SoracomClient) FindOnlineSubscribersByName(name string) ([]models.Subscriber, error) {
-	subscribers, err := c.FindSubscribersByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	var onlineSubscribers []models.Subscriber
-	for _, s := range subscribers {
-		if s.SessionStatus.Online {
-			onlineSubscribers = append(onlineSubscribers, s)
-		}
-	}
-	return onlineSubscribers, nil
-}
-
 // FindOnlineSIMsByName finds online SIMs which has the specified name
 func (c *SoracomClient) FindOnlineSIMsByName(name string) ([]models.SIM, error) {
 	sims, err := c.FindSIMsByName(name)
@@ -209,23 +161,6 @@ func (c *SoracomClient) FindOnlineSIMsByName(name string) ([]models.SIM, error) 
 		}
 	}
 	return onlineSIMs, nil
-}
-
-// GetSubscriber gets subscriber information for specified IMSI
-func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   fmt.Sprintf("subscribers/%s", imsi),
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var subscriber models.Subscriber
-	err = json.NewDecoder(res.Body).Decode(&subscriber)
-
-	return &subscriber, err
 }
 
 // GetSIM gets SIM information for specified SIM ID
@@ -265,22 +200,6 @@ func (c *SoracomClient) ListPortMappings() ([]models.PortMapping, error) {
 	return portMapping, err
 }
 
-// FindPortMappingsForSubscriber finds port mappings for specified subscriber
-func (c *SoracomClient) FindPortMappingsForSubscriber(subscriber models.Subscriber) ([]models.PortMapping, error) {
-	res, err := c.callAPI(&apiParams{
-		method: "GET",
-		path:   fmt.Sprintf("port_mappings/subscribers/%s", subscriber.Imsi),
-		body:   "",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var portMapping []models.PortMapping
-	err = json.NewDecoder(res.Body).Decode(&portMapping)
-	return portMapping, err
-}
-
 // FindPortMappingsForSIM finds port mappings for specified SIM
 func (c *SoracomClient) FindPortMappingsForSIM(sim models.SIM) ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
@@ -295,44 +214,6 @@ func (c *SoracomClient) FindPortMappingsForSIM(sim models.SIM) ([]models.PortMap
 	var portMapping []models.PortMapping
 	err = json.NewDecoder(res.Body).Decode(&portMapping)
 	return portMapping, err
-}
-
-// FindAvailablePortMappingsForSubscriber finds available port mappings for specified subscriber and port
-func (c *SoracomClient) FindAvailablePortMappingsForSubscriber(subscriber models.Subscriber, port int) ([]models.PortMapping, error) {
-	portMappings, err := c.FindPortMappingsForSubscriber(subscriber)
-	if err != nil {
-		return nil, err
-	}
-
-	var currentPortMappings []models.PortMapping
-	var availablePortMappings []models.PortMapping
-
-	for _, pm := range portMappings {
-		if pm.Destination.Port == port {
-			currentPortMappings = append(currentPortMappings, pm)
-		}
-	}
-
-	if len(currentPortMappings) > 0 {
-		fmt.Printf("nssh: → found %d port mapping(s) for %s:%d\n", len(currentPortMappings), subscriber.Imsi, port)
-		ip, err := GetIP()
-
-		// search port mappings which allows being connected from current IP address
-		if err == nil { // ignore https://checkip.amazonaws.com/ error
-			fmt.Printf("nssh: → check allowed CIDR for current IP address is %s\n", ip)
-			for _, pm := range currentPortMappings {
-				for _, r := range pm.Source.IPRanges {
-					_, ipNet, err := net.ParseCIDR(r)
-					if err == nil {
-						if ipNet.Contains(ip) {
-							availablePortMappings = append(availablePortMappings, pm)
-						}
-					}
-				}
-			}
-		}
-	}
-	return availablePortMappings, nil
 }
 
 // FindAvailablePortMappingsForSIM finds available port mappings for specified SIM and port
@@ -371,45 +252,6 @@ func (c *SoracomClient) FindAvailablePortMappingsForSIM(sim models.SIM, port int
 		}
 	}
 	return availablePortMappings, nil
-}
-
-// CreatePortMappingForSubscriber creates port mappings for specified
-// subscriber, port, and duration
-func (c *SoracomClient) CreatePortMappingForSubscriber(subscriber models.Subscriber, port, duration int) (*models.PortMapping, error) {
-	body, err := json.Marshal(struct {
-		Duration    int  `json:"duration"`
-		TLSRequired bool `json:"tlsRequired"`
-		Destination struct {
-			Imsi string `json:"imsi"`
-			Port int    `json:"port"`
-		} `json:"destination"`
-	}{
-		Duration:    duration * 60,
-		TLSRequired: false,
-		Destination: struct {
-			Imsi string `json:"imsi"`
-			Port int    `json:"port"`
-		}{
-			Imsi: subscriber.Imsi,
-			Port: port,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.callAPI(&apiParams{
-		method: "POST",
-		path:   "port_mappings",
-		body:   string(body),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var portMapping models.PortMapping
-	err = json.NewDecoder(res.Body).Decode(&portMapping)
-	return &portMapping, err
 }
 
 // CreatePortMappingForSIM creates port mappings for specified

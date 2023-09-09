@@ -1,6 +1,6 @@
 # nssh
 
-SSH client for [SORACOM Napter](https://developers.soracom.io/en/docs/napter/). You can easily open an SSH connection with your subscriber's name.
+SSH client for [SORACOM Napter](https://developers.soracom.io/en/docs/napter/). You can easily open an SSH connection with your SIM's name.
 
 ![How it works](media/nssh.gif)
 
@@ -83,11 +83,11 @@ You can specify coverage type, profile name, port number, connection duration, o
   ```console
   $ nssh connect pi@your-sim-name --port 2222 --duration 120
   ```
-- Select online subscriber to connect interactively:
+- Select online SIM to connect interactively:
   ```console
   $ nssh interactive -u pi -i ~/.ssh/id_rsa
   ```
-  Online subscriber list will be shown, then select one of them by navigating with arrow keys or filtering by typing <kbd>/</kbd>. Press <kbd>enter</kbd> to connect, or <kbd>esc</kbd>/<kbd>Ctrl+c</kbd>/<kbd>q</kbd> to quit.
+  Online SIM list will be shown, then select one of them by navigating with arrow keys or filtering by typing <kbd>/</kbd>. Press <kbd>enter</kbd> to connect, or <kbd>esc</kbd>/<kbd>Ctrl+c</kbd>/<kbd>q</kbd> to quit.
 
 ### Details
 
