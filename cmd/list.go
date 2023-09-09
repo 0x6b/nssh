@@ -14,7 +14,7 @@ func listCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(0, 1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				portMappings, err := client.FindPortMappings()
+				portMappings, err := client.ListPortMappings()
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)

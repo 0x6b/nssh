@@ -157,8 +157,8 @@ func (c *SoracomClient) GetSubscriber(imsi string) (*models.Subscriber, error) {
 	return &subscriber, err
 }
 
-// FindPortMappings finds all port mappings
-func (c *SoracomClient) FindPortMappings() ([]models.PortMapping, error) {
+// ListPortMappings finds all port mappings
+func (c *SoracomClient) ListPortMappings() ([]models.PortMapping, error) {
 	res, err := c.callAPI(&apiParams{
 		method: "GET",
 		path:   "port_mappings",
