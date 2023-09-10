@@ -394,6 +394,8 @@ func (c *SoracomClient) Connect(login, identity string, portMapping *models.Port
 
 func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
+	// cast syscall.Stdin to int looks redundant, but it is necessary to
+	// compile on Windows
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
 	return string(password), err
 }
