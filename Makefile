@@ -6,7 +6,7 @@ $(BIN): $(SRC)
 	$(GO) build -trimpath ./cmd/nssh
 
 snapshot:
-	which goreleaser && goreleaser --snapshot --skip-publish --rm-dist
+	which goreleaser && goreleaser --snapshot --skip-publish --clean
 
 clean:
 	rm -fr $(BIN) dist
